@@ -13,7 +13,7 @@ import java.util.List;
 public class KirokuController {
     private final List<Student> students = new ArrayList<>();
     private final KirokuView view = new KirokuView();
-    private static final String FILE_NAME = "entry-log.txt";
+    private static final String FILE_NAME = "logbook.csv";
 
     /**
      * Starts the main interaction loop for Kiroku.
