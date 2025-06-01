@@ -4,310 +4,252 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Kiroku {
-    private static Scanner scanner;
-    private static ArrayList<Student> students;
-    private static int choice;
-    private static String name;
-    private static String refNum;
-    private static String date;
-
-    // Variables related to search
-    private static String query;
-    private static boolean found;
-    
-    // external file for all records
-    private static final String FILE_NAME = "logbook.txt";
-    private static final String INDEX_MESSAGE = "\nEnter student number to ";
-    
     public static void main(String[] args) {
-        scanner = new Scanner(System.in);
-        students = new ArrayList<>();
-        
-        loadFromFile();
-        
-        do {
-            initialPrompt();
-            
-            switch (choice) {
-                case 1 -> caseOne();
-                case 2 -> caseTwo();
-                case 3 -> caseThree();
-                case 4 -> caseFour();
-                case 5 -> caseFive();
-                case 0 -> System.out.println("\nExiting logbook...\n");
-                default -> System.out.println("\nInvalid choice. Please try again.\n");
-            }
-        } while (choice != 0);
-        
-        scanner.close();
+        KirokuController controller = new KirokuController();
+        controller.start();
     }
-    
-	private static void initialPrompt() {
-	    while (true) {
-	        System.out.println("\n--- Student Logbook Menu ---");
-	        System.out.println("1. Add new student entry");
-	        System.out.println("2. View all entries");
-	        System.out.println("3. Edit existing entry");
-	        System.out.println("4. Delete existing entry");
-	        System.out.println("5. Search existing entries");
-	        System.out.println("0. Exit program");
-	        System.out.print("\nEnter your choice: ");
-
-	        String input = scanner.nextLine().trim();
-
-	        try {
-	            choice = Integer.parseInt(input);
-	            break;
-	        } catch (NumberFormatException e) {
-	            System.out.println("\nInvalid input. Please enter a valid number (0-5).");
-	        }
-	    }
-	}
-    
-    private static void caseOne() {
-        String name = getNameInput();
-        String refNum = getRefNumInput();
-        String date = getDateInput();
-
-        students.add(new Student(name, refNum, date));
-        saveToFile();
-        System.out.println("\nStudent entry added.");
-    }
-    
-    private static void caseTwo() {
-        if (students.isEmpty()) {
-            System.out.println("\nNo students logged yet.");
-        } else {
-            System.out.println("\n------ Logged Students ------");
-            getStudentEntries();
-        }
-    }
-    
-    private static void caseThree() {
-        if (isListEmpty("No entries to edit.")) return;
-        System.out.println("\n------ Select a Student to Edit ------");
-        getStudentEntries();
-
-        int index = getValidStudentIndex(INDEX_MESSAGE + "edit: ");
-        if (index == -1) return;
-
-        Student student = students.get(index);
-        String newName = getNameInput();
-        String newDate = getDateInput();
-
-        student.setFullName(newName);
-        student.setDate(newDate);
-        saveToFile();
-
-        System.out.println("\nStudent updated.");
-    }
-
-    private static void caseFour() {
-        if (isListEmpty("No entries to manage.")) return;
-        System.out.println("\n------ Select a Student to Delete ------");
-        getStudentEntries();
-
-        int index = getValidStudentIndex(INDEX_MESSAGE + "delete: ");
-        Student toDelete = students.get(index);
-
-        System.out.print("Are you sure you want to delete \"" + toDelete.getFullName() + "\"? (y/n): ");
-        String confirm = scanner.nextLine().trim().toLowerCase();
-
-        if (confirm.equals("y") || confirm.equals("yes")) {
-            students.remove(index);
-            saveToFile();
-            System.out.println("\nStudent deleted.");
-        } else {
-            System.out.println("\nDeletion cancelled.");
-        }
-    }
-
-	private static void caseFive() {
-		if (isListEmpty("\nNo student to search.")) return;
-		int searchMode = getSearchMode();
-
-		System.out.print("\nEnter name to search: ");
-		query = scanner.nextLine().trim().toLowerCase();
-
-		found = false;
-		System.out.println("\n--- Search Results ---");
-
-		for (int index = 0; index < students.size(); index++) {
-			Student studentToSearch = students.get(index);
-				switch (searchMode) {
-					case 1 -> searchByName(studentToSearch, index);
-					case 2 -> searchByRefNum(studentToSearch, index);
-				}
-			}
-
-		if (!found) {
-			System.out.println("\nNo students matched your search.");
-		}
-	}
-	
-	private static int getSearchMode() {
-		while (true) {
-			System.out.println("\n--- Search By ---");
-			System.out.println("1. Student Name");
-			System.out.println("2. Reference Number");
-			System.out.print("\nEnter choice: ");
-			String input = scanner.nextLine().trim();
-
-			switch (input) {
-				case "1":
-					return 1;
-				case "2":
-					return 2;
-				default:
-					System.out.println("Invalid choice. Please enter 1 or 2.");
-			}
-		}
 }
 
+class KirokuView {
+    private final Scanner scanner = new Scanner(System.in);
 
-	private static void searchByName(Student studentToSearch, int index) {
-		if (studentToSearch.getFullName().toLowerCase().contains(query)) {
-			studentToSearch.displayInfo(index + 1);
-			found = true;
-		}
-	}
-	
-	private static void searchByRefNum(Student studentToSearch, int index) {
-		if (studentToSearch.getRefNum().contains(query)) {
-			studentToSearch.displayInfo(index + 1);
-			found = true;
-		}
-	}
-
-    private static String getNameInput() {
-        do {
-            System.out.print("Enter full name: ");
-            name = scanner.nextLine().trim();
-            if (!isValidName(name)) {
-                System.out.println("\nPlease enter student name.");
-            } 
-        } while (!isValidName(name));
-        return name;
+    public void showMenu() {
+        System.out.println("\n--- Student Logbook Menu ---");
+        System.out.println("1. Add new student entry");
+        System.out.println("2. View all entries");
+        System.out.println("3. Edit existing entry");
+        System.out.println("4. Delete existing entry");
+        System.out.println("5. Search entries");
+        System.out.println("0. Exit");
+        System.out.print("\nEnter your choice: ");
     }
 
-    private static String getRefNumInput() {
-        int refNumLength = 12;
-
-        do {
-            System.out.println("Enter ref. no.: ");
-            refNum = scanner.nextLine().trim();
-            if (!isValidRefNum(refNum, refNumLength)) {
-                System.out.println("\nPlease enter correct ref. no.");
-            }
-        } while (!isValidRefNum(refNum, refNumLength));
-        return refNum;
+    public void showStudent(Student s, int index) {
+        String formattedDate = s.getEntryDateTime().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+        System.out.printf("%d. Name: %s | Ref: %s | Date: %s%n", index, s.getFullName(), s.getReferenceNumber(), formattedDate);
     }
 
-    private static String getDateInput() {
-        do {
-            System.out.print("Enter date (DD/MM/YYYY): ");
-            date = scanner.nextLine();
-            if (!isValidDate(date)) {
-                System.out.println("\nInvalid date format. Please try again.");
-            }
-        } while (!isValidDate(date));
-        return date;
+    public void showMessage(String msg) {
+        System.out.println(msg);
     }
 
-    private static int getValidStudentIndex(String message) {
-        int index = -1;
+    public String prompt(String label) {
+        System.out.print(label);
+        return scanner.nextLine().trim();
+    }
 
+    public int promptInt(String label, int min, int max) {
         while (true) {
-            System.out.print(message);
-            String input = scanner.nextLine();
-
             try {
-                index = Integer.parseInt(input);
-                if (index >=1 && index <= students.size()) {
-                    return index - 1;
-                } else {
-                    System.out.println("Invalid number. Please enter a number between 1 and " + students.size() + ".");
-                }
+                System.out.print(label);
+                int val = Integer.parseInt(scanner.nextLine());
+                if (val >= min && val <= max) return val;
+                System.out.printf("\nPlease enter a number between %d and %d.%n", min, max);
             } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Please enter a valid numeric student number.");
+                System.out.println("\nInvalid number. Please try again.\n");
             }
-        }
-    }
-    
-    private static void getStudentEntries() {
-        for (int i = 0; i < students.size(); i++) {
-            students.get(i).displayInfo(i + 1);
-        }
-    }
-    
-    private static void saveToFile() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
-            for (Student s : students) {
-                // write student name and date separated by pipe
-                writer.write(
-                    s.getFullName() + "|" + 
-                    s.getRefNum() + "|" +
-                    s.getDate());
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            System.out.println("\nError saving to file: " + e.getMessage());
-        }
-    }
-    
-    private static void loadFromFile() {
-        File file = new File(FILE_NAME);
-        // if file does not exist, exit from this method
-        if (!file.exists()) return;
-        
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
-            
-            // while read lines from reader are not null
-            while ((line = reader.readLine()) != null) {
-                // split the line into two parts from the pipe
-                String[] parts = line.split("\\|");
-                if (parts.length == 3) {
-                    // re-add extracted name and date
-                    students.add(new Student(parts[0], parts[1], parts[2]));
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("\nError reading from file: " + e.getMessage());
         }
     }
 
-    private static boolean isListEmpty(String message) {
+    public boolean confirm(String question) {
+        String input = prompt(question + " (y/n): ").toLowerCase();
+        return input.equals("y") || input.equals("yes");
+    }
+}
+
+class KirokuController {
+    private final List<Student> students = new ArrayList<>();
+    private final KirokuView view = new KirokuView();
+    private static final String FILE_NAME = "lobok.txt";
+
+    public void start() {
+        DataUtils.loadFromFile(FILE_NAME, students);
+
+        int choice;
+        do {
+            view.showMenu();
+            choice = Validators.parseMenuChoice(view.prompt(""));
+
+            switch (choice) {
+                case 1 -> addStudent();
+                case 2 -> displayStudents();
+                case 3 -> editStudent();
+                case 4 -> deleteStudent();
+                case 5 -> searchStudents();
+                case 0 -> view.showMessage("Exiting lobok...");
+                default -> view.showMessage("Invalid option. Try again.");
+            }
+        } while (choice != 0);
+
+        DataUtils.saveToFile(FILE_NAME, students);
+    }
+
+    private void addStudent() {
+        String name = DataUtils.promptValidName(view);
+        String ref = DataUtils.promptValidRefNum(view);
+        LocalDateTime dateTime = DataUtils.promptValidDateTime(view);
+        students.add(new Student(name, ref, dateTime));
+        view.showMessage("\nStudent entry added.");
+    }
+
+    private void displayStudents() {
+        if (isListEmpty("\nNo students logged.")) return;
+        int i = 1;
+        for (Student s : students) view.showStudent(s, i++);
+    }
+
+    private void editStudent() {
+        if (isListEmpty("\nNo students to edit.")) return;
+        displayStudents();
+        int index = view.promptInt("\nSelect student number to edit: ", 1, students.size()) - 1;
+        Student s = students.get(index);
+        s.setFullName(DataUtils.promptValidName(view));
+        s.setEntryDateTime(DataUtils.promptValidDateTime(view));
+        view.showMessage("\nStudent updated.");
+    }
+
+    private void deleteStudent() {
+        if (isListEmpty("\nNo students to delete.")) return;
+        displayStudents();
+        int index = view.promptInt("\nSelect student number to delete: ", 1, students.size()) - 1;
+        if (view.confirm("Are you sure you want to delete \"" + students.get(index).getFullName() + "\"?")) {
+            students.remove(index);
+            view.showMessage("\nStudent deleted.");
+        } else {
+            view.showMessage("\nDeletion cancelled.");
+        }
+    }
+
+    private void searchStudents() {
+        if (isListEmpty("\nNo students to search.")) return;
+        int mode = view.promptInt("\nSearch by: 1) Name  2) Ref #: ", 1, 2);
+        String query = view.prompt("\nEnter search term: ").toLowerCase();
+        List<Student> results = SearchUtils.search(students, query, mode == 1);
+        if (results.isEmpty()) {
+            view.showMessage("\nNo matching results.");
+        } else {
+            int i = 1;
+            for (Student s : results) view.showStudent(s, i++);
+        }
+    }
+
+    public boolean isListEmpty(String message) {
         if (students.isEmpty()) {
-            System.out.println(message);
+            view.showMessage(message);
             return true;
         }
         return false;
     }
+}
 
-    private static boolean isValidName(String name) {
-        return (name != null && !name.trim().isEmpty());
+class SearchUtils {
+    public static List<Student> search(List<Student> students, String query, boolean byName) {
+        List<Student> results = new ArrayList<>();
+        for (Student s : students) {
+            if (byName && s.getFullName().toLowerCase().contains(query)) {
+                results.add(s);
+            } else if (!byName && s.getReferenceNumber().contains(query)) {
+                results.add(s);
+            }
+        }
+        return results;
+    }
+}
+
+class DataUtils {
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+    public static void loadFromFile(String filename, List<Student> students) {
+        File file = new File(filename);
+        if (!file.exists()) return;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                Student s = Student.fromStorageFormat(line);
+                if (s != null) students.add(s);
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading file: " + e.getMessage());
+        }
     }
 
-    private static boolean isValidRefNum(String refNum, int length) {
-        return ((refNum != null) && (!refNum.trim().isEmpty()) && (refNum.length() == length) && refNum.matches("\\d+"));
+    public static void saveToFile(String filename, List<Student> students) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+            for (Student s : students) writer.write(s.toStorageFormat() + "\n");
+        } catch (IOException e) {
+            System.out.println("Error writing file: " + e.getMessage());
+        }
     }
 
-    private static boolean isValidDate(String input) {
-        DateTimeFormatter dateFormatting = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    public static String promptValidName(KirokuView view) {
+        String name;
+        do {
+            name = view.prompt("\nEnter full name: ");
+            if (!Validators.isValidName(name)) {
+                view.showMessage("\nName cannot be empty.\n");
+            }
+        } while (!Validators.isValidName(name));
+        return name;
+    }
 
+    public static String promptValidRefNum(KirokuView view) {
+        String ref;
+        do {
+            ref = view.prompt("Enter reference number (12 digits): ");
+            if (!Validators.isValidRefNum(ref, 12)) {
+                view.showMessage("\nInvalid reference number. It must be exactly 12 digits.\n");
+            }
+        } while (!Validators.isValidRefNum(ref, 12));
+        return ref;
+    }
+
+    public static LocalDateTime promptValidDateTime(KirokuView view) {
+        String input;
+        while (true) {
+            input = view.prompt("Enter date and time (DD/MM/YYYY HH:MM): ");
+            if (Validators.isValidDateTime(input)) {
+                return LocalDateTime.parse(input, formatter);
+            } else {
+                view.showMessage("\nInvalid date/time format. Please follow DD/MM/YYYY HH:MM.\n");
+            }
+        }
+    }
+}
+
+class Validators {
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+    public static boolean isValidName(String name) {
+        return name != null && !name.trim().isEmpty();
+    }
+
+    public static boolean isValidRefNum(String ref, int length) {
+        return ref != null && ref.matches("\\d{" + length + "}");
+    }
+
+    public static boolean isValidDateTime(String input) {
         try {
-            LocalDate.parse(input, dateFormatting);
+            LocalDateTime.parse(input, formatter);
             return true;
         } catch (DateTimeParseException e) {
             return false;
+        }
+    }
+
+    public static int parseMenuChoice(String input) {
+        try {
+            return Integer.parseInt(input.trim());
+        } catch (NumberFormatException e) {
+            return -1;
         }
     }
 }
