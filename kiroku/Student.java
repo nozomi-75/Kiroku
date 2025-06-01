@@ -1,4 +1,6 @@
-import java.time.LocalDateTime;
+package kiroku;
+
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -8,9 +10,11 @@ import java.time.format.DateTimeFormatter;
 public class Student {
     private String fullName;
     private String referenceNumber;
-    private LocalDateTime entryDateTime;
+    private ZonedDateTime entryDateTime;
 
-    public Student(String fullName, String referenceNumber, LocalDateTime entryDateTime) {
+    private static DateTimeFormatter dateFormatting = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm z");
+
+    public Student(String fullName, String referenceNumber, ZonedDateTime entryDateTime) {
         this.fullName = fullName;
         this.referenceNumber = referenceNumber;
         this.entryDateTime = entryDateTime;
@@ -18,10 +22,10 @@ public class Student {
 
     public String getFullName() { return fullName; }
     public String getReferenceNumber() { return referenceNumber; }
-    public LocalDateTime getEntryDateTime() { return entryDateTime; }
+    public ZonedDateTime getEntryDateTime() { return entryDateTime; }
 
     public void setFullName(String fullName) { this.fullName = fullName; }
-    public void setEntryDateTime(LocalDateTime entryDateTime) { this.entryDateTime = entryDateTime; }
+    public void setEntryDateTime(ZonedDateTime entryDateTime) { this.entryDateTime = entryDateTime; }
 
     /**
      * A helper method to write the input to an external file.
@@ -29,7 +33,7 @@ public class Student {
      * @see DataUtils#saveToFile(String, java.util.List)
      */
     public String toStorageFormat() {
-        return fullName + "," + referenceNumber + "," + entryDateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+        return fullName + "," + referenceNumber + "," + entryDateTime.format(dateFormatting);
     }
 
     /**
@@ -40,7 +44,7 @@ public class Student {
     public static Student fromStorageFormat(String entry) {
         String[] parts = entry.split(",");
         if (parts.length != 3) return null;
-        LocalDateTime dateTime = LocalDateTime.parse(parts[2], DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+        ZonedDateTime dateTime = ZonedDateTime.parse(parts[2], dateFormatting);
         return new Student(parts[0], parts[1], dateTime);
     }
 }

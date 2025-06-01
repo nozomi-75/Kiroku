@@ -1,3 +1,5 @@
+package kiroku;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -5,6 +7,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -85,12 +89,13 @@ public class DataUtils {
         return ref;
     }
 
-    public static LocalDateTime promptValidDateTime(KirokuView view) {
+    public static ZonedDateTime promptValidDateTime(KirokuView view) {
         String input;
         while (true) {
             input = view.prompt("Enter date and time (DD/MM/YYYY HH:MM): ");
             if (Validators.isValidDateTime(input)) {
-                return LocalDateTime.parse(input, formatter);
+                LocalDateTime localDateTime = LocalDateTime.parse(input, formatter);
+                return localDateTime.atZone(ZoneId.systemDefault());
             } else {
                 view.showMessage("\nInvalid date/time format. Please follow DD/MM/YYYY HH:MM.\n");
             }

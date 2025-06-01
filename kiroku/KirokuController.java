@@ -1,4 +1,6 @@
-import java.time.LocalDateTime;
+package kiroku;
+
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,7 +60,7 @@ public class KirokuController {
     private void addStudent() {
         String name = DataUtils.promptValidName(view);
         String ref = DataUtils.promptValidRefNum(view);
-        LocalDateTime dateTime = DataUtils.promptValidDateTime(view);
+        ZonedDateTime dateTime = DataUtils.promptValidDateTime(view);
         students.add(new Student(name, ref, dateTime));
         view.showMessage("\nStudent entry added.");
     }
@@ -75,7 +77,9 @@ public class KirokuController {
         int index = view.promptInt("\nSelect student number to edit: ", 1, students.size()) - 1;
         Student s = students.get(index);
         s.setFullName(DataUtils.promptValidName(view));
-        s.setEntryDateTime(DataUtils.promptValidDateTime(view));
+
+        ZonedDateTime dateTime = DataUtils.promptValidDateTime(view);
+        s.setEntryDateTime(dateTime);
         view.showMessage("\nStudent updated.");
     }
 

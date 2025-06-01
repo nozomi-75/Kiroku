@@ -24,16 +24,15 @@ Alternatively, you can clone the repository using the command below:
 2. **Compile and run the program**
 
     ```bash
-    javac *.java
-    java Kiroku
+    javac kiroku/*.java
+    java kiroku.Kiroku
     ```
 
 ## Future Enhancements
 
-- Add support for CSV export/import
+- Add support for CSV import
 - Improved navigation and user experience
 - Sort entries alphabetically or by date
-- LocalDateTime parsing with time zone awareness
 
 ## Credits and License
 
