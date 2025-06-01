@@ -1,14 +1,20 @@
 public class Student {
     private String fullName;
+    private String refNum;
     private String date;
 
-    public Student(String fullName, String date) {
+    public Student(String fullName, String refNum, String date) {
         this.fullName = fullName;
+        this.refNum = refNum;
         this.date = date;
     }
 
     public String getFullName() {
         return fullName;
+    }
+
+    public String getRefNum() {
+        return refNum;
     }
 
     public String getDate() {
