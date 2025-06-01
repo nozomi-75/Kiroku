@@ -2,11 +2,37 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Bridge between the Model: {@link Student}, the View: {@link KirokuView},
+ * and respective utility classes.
+ * <p>
+ * It receives input then interacts with the Model and
+ * View when these inputs change context data.
+ * </p>
+ */
 public class KirokuController {
     private final List<Student> students = new ArrayList<>();
     private final KirokuView view = new KirokuView();
     private static final String FILE_NAME = "lobok.txt";
 
+    /**
+     * Starts the main interaction loop for Kiroku.
+     * <p>
+     * This method displays a menu and handles user input by delegating
+     * to the appropriate action methods: adding, viewing, editing,
+     * deleting, or searching for student entries. The loop continues
+     * until the user chooses to exit.
+     * </p>
+     *
+     * <p>
+     * When invoked, it will immediately attempt to load entries
+     * from an existing log file. It will also automatically save
+     * the entries before termination.
+     * </p>
+     * 
+     * @see Kiroku
+     * @see KirokuView
+     */
     public void start() {
         DataUtils.loadFromFile(FILE_NAME, students);
 

@@ -8,9 +8,30 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+/**
+ * Set of simple utility methods to process data through
+ * out the program execution.
+ * 
+ * @see Validators
+ */
 public class DataUtils {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
+    /**
+     * Utility to load entries from an external file.
+     * <p>
+     * If there is no file to fetch from, it skips out.
+     * Otherwise, it starts a BufferedReader to read said file.
+     * If the entry is valid, it will call 
+     * {@link Student#fromStorageFormat(String)}
+     * to create a Student object based from the file's data.
+     * </p>
+     * 
+     * @param filename : Entry output file name.
+     * @param students : The list storing the entries as objects.
+     * @see KirokuController#start()
+     * @see Student#fromStorageFormat(String)
+     */
     public static void loadFromFile(String filename, List<Student> students) {
         File file = new File(filename);
         if (!file.exists()) return;
@@ -26,6 +47,14 @@ public class DataUtils {
         }
     }
 
+    /**
+     * Utility to save entries to an external file.
+     * 
+     * @param filename : Entry output file name.
+     * @param students : The list storing the entries as objects.
+     * @see KirokuController#start()
+     * @see Student#toStorageFormat()
+     */
     public static void saveToFile(String filename, List<Student> students) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
             for (Student s : students) writer.write(s.toStorageFormat() + "\n");

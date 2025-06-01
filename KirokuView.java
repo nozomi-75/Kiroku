@@ -1,6 +1,12 @@
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
+/**
+ * The class that handles data being displayed to the user.
+ * <p>
+ * Bridged by {@link KirokuController}.
+ * </p>
+ */
 public class KirokuView {
     private final Scanner scanner = new Scanner(System.in);
 

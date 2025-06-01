@@ -2,6 +2,13 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
+/**
+ * Set of simple methods to validate user input.
+ * @see KirokuController#start()
+ * @see DataUtils#promptValidName(KirokuView)
+ * @see DataUtils#promptValidRefNum(KirokuView)
+ * @see DataUtils#promptValidDateTime(KirokuView)
+ */
 public class Validators {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
