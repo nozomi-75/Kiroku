@@ -17,6 +17,10 @@ public class Kiroku {
     private static String name;
     private static String refNum;
     private static String date;
+
+    // Variables related to search
+    private static String query;
+    private static boolean found;
     
     // external file for all records
     private static final String FILE_NAME = "logbook.txt";
@@ -36,6 +40,7 @@ public class Kiroku {
                 case 2 -> caseTwo();
                 case 3 -> caseThree();
                 case 4 -> caseFour();
+                case 5 -> caseFive();
                 case 0 -> System.out.println("\nExiting logbook...\n");
                 default -> System.out.println("\nInvalid choice. Please try again.\n");
             }
@@ -44,18 +49,27 @@ public class Kiroku {
         scanner.close();
     }
     
-    private static void initialPrompt() {
-        System.out.println("\n--- Student Logbook Menu ---");
-        System.out.println("1. Add new student entry");
-        System.out.println("2. View all entries");
-        System.out.println("3. Edit existing entry");
-        System.out.println("4. Delete existing entry");
-        System.out.println("0. Exit program");
-        System.out.print("\nEnter your choice: ");
-        
-        choice = scanner.nextInt();
-        scanner.nextLine();
-    }
+	private static void initialPrompt() {
+	    while (true) {
+	        System.out.println("\n--- Student Logbook Menu ---");
+	        System.out.println("1. Add new student entry");
+	        System.out.println("2. View all entries");
+	        System.out.println("3. Edit existing entry");
+	        System.out.println("4. Delete existing entry");
+	        System.out.println("5. Search existing entries");
+	        System.out.println("0. Exit program");
+	        System.out.print("\nEnter your choice: ");
+
+	        String input = scanner.nextLine().trim();
+
+	        try {
+	            choice = Integer.parseInt(input);
+	            break;
+	        } catch (NumberFormatException e) {
+	            System.out.println("\nInvalid input. Please enter a valid number (0-5).");
+	        }
+	    }
+	}
     
     private static void caseOne() {
         String name = getNameInput();
@@ -114,6 +128,63 @@ public class Kiroku {
             System.out.println("\nDeletion cancelled.");
         }
     }
+
+	private static void caseFive() {
+		if (isListEmpty("\nNo student to search.")) return;
+		int searchMode = getSearchMode();
+
+		System.out.print("\nEnter name to search: ");
+		query = scanner.nextLine().trim().toLowerCase();
+
+		found = false;
+		System.out.println("\n--- Search Results ---");
+
+		for (int index = 0; index < students.size(); index++) {
+			Student studentToSearch = students.get(index);
+				switch (searchMode) {
+					case 1 -> searchByName(studentToSearch, index);
+					case 2 -> searchByRefNum(studentToSearch, index);
+				}
+			}
+
+		if (!found) {
+			System.out.println("\nNo students matched your search.");
+		}
+	}
+	
+	private static int getSearchMode() {
+		while (true) {
+			System.out.println("\n--- Search By ---");
+			System.out.println("1. Student Name");
+			System.out.println("2. Reference Number");
+			System.out.print("\nEnter choice: ");
+			String input = scanner.nextLine().trim();
+
+			switch (input) {
+				case "1":
+					return 1;
+				case "2":
+					return 2;
+				default:
+					System.out.println("Invalid choice. Please enter 1 or 2.");
+			}
+		}
+}
+
+
+	private static void searchByName(Student studentToSearch, int index) {
+		if (studentToSearch.getFullName().toLowerCase().contains(query)) {
+			studentToSearch.displayInfo(index + 1);
+			found = true;
+		}
+	}
+	
+	private static void searchByRefNum(Student studentToSearch, int index) {
+		if (studentToSearch.getRefNum().contains(query)) {
+			studentToSearch.displayInfo(index + 1);
+			found = true;
+		}
+	}
 
     private static String getNameInput() {
         do {
