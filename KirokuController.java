@@ -13,7 +13,7 @@ import java.util.List;
 public class KirokuController {
     private final List<Student> students = new ArrayList<>();
     private final KirokuView view = new KirokuView();
-    private static final String FILE_NAME = "lobok.txt";
+    private static final String FILE_NAME = "entry-log.txt";
 
     /**
      * Starts the main interaction loop for Kiroku.
@@ -47,7 +47,7 @@ public class KirokuController {
                 case 3 -> editStudent();
                 case 4 -> deleteStudent();
                 case 5 -> searchStudents();
-                case 0 -> view.showMessage("Exiting lobok...");
+                case 0 -> view.showMessage("Exiting Kiroku...");
                 default -> view.showMessage("Invalid option. Try again.");
             }
         } while (choice != 0);
